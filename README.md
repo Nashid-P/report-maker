@@ -1,5 +1,7 @@
 # Report Maker
 
+[![Code Grade](https://www.code-inspector.com/project/15211/status/svg)](https://frontend.code-inspector.com/public/project/15211/report-maker/dashboard)
+
 Students report card making program in C++
 
 **Compile**
