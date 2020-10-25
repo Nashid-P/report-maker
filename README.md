@@ -10,7 +10,6 @@ Students report card making program in C++
 2. cd report-maker
 3. compile the source code : mkdir build && cd build && cmake .. && make
 4. run the program : ./reportmaker
-Success!!
 
 *Windows:-*
 clone repo and open the source folder
