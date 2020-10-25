@@ -124,7 +124,9 @@ int main()
 			break;
 	}
     cout << colors::white << endl;
-	system(hold);
+	#ifdef _WIN32
+		system(hold);
+	#endif
 	return 0;
 }
 
