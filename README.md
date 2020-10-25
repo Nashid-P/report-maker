@@ -6,7 +6,7 @@ Students report card making program in C++
 *Linux:-*
 1. clone repo : git clone https://github.com/nashid-dev/report-maker.git
 2. cd report-maker
-3. compile the source code : g++ main.cpp -o reportmaker
+3. compile the source code : mkdir build && cd build && cmake .. && make
 4. run the program : ./reportmaker
 Success!!
 
