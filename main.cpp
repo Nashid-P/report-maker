@@ -1,5 +1,5 @@
 /**
- * Developer : IKTHSS SSC BATCH
+ * Developer : IKT HSS SSC BATCH
  * Program name : Report Maker
  * Description : A simple program in c++ for making students report card
  * 
@@ -47,7 +47,6 @@
 
 #include <iostream>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring> 
 #include <fstream> 
 #include <ctime>
@@ -55,6 +54,7 @@
 #include <limits>
 #ifdef _WIN32
     const char* cmd = "cls";
+    const char* hold = "PAUSE";
 #elif __linux__
     const char* cmd = "clear";
 #endif 
@@ -66,11 +66,11 @@ void Execute();
 void manage(int );
 struct students_details{ 
 		string name;
-		int marks[6];
-		int roll_num;
-		int total = 0;
-		float average;
-		float percentage;
+		int marks[6]{};
+		int roll_num{};
+		int total{};
+		double average{};
+		double percentage{};
 };
 void history(int, struct students_details *report, const char **arr);
 bool check_exist(int, int, struct students_details *report);
@@ -94,7 +94,7 @@ int main()
 		            |_|                                       
 
   
-	            Developed by IKTHSS SSC BATCH 2020
+	            Developed by IKT HSS SSC BATCH 2020
 	)" << colors::white << endl;	
 	cout << "\n\t\t\t\t 1. Create a New Report " << endl;
 	cout << "\t\t\t\t 2. Check the Report log "  << endl;
@@ -113,7 +113,7 @@ int main()
 			manage(op); 
 			break;
 		case 4:
-			cout << colors::green << "\n\t\t\t\t Developed by IKTHSS SSC BATCH " << endl;
+			cout << colors::green << "\n\t\t\t\t Developed by IKT HSS SSC BATCH " << endl;
 			cout << "\t\t\t\t Simple program to make report cards of students " << endl;
 			cout << "\t\t\t\t History logs are stored in .report_history file and can be accessed using Option 3 in main menu " << endl;
 			cout << "\t\t\t\t Thank you for using our program \n\n\n" << colors::white << endl;
@@ -121,16 +121,17 @@ int main()
 		default:
 			cout << "\n\t\t\t\t Exiting Program " << endl;
 			system(cmd);
-            exit(0); 
+			break;
 	}
     cout << colors::white << endl;
+	system(hold);
 	return 0;
 }
 
 void Execute()
 {
 	
-	int numberOfreports;
+	int number_of_reports;
 	
     // Available Subjects
 	const char* subjects[] = {
@@ -141,19 +142,19 @@ void Execute()
 						" English : ",
 						" First Language : "}; 
 	
-	cout << "\n\n\t\t\t\t STUDENTS MARKLIST 2020 \t\t\n";
+	cout << "\n\n\t\t\t\t STUDENTS MARK LIST \t\t\n";
 	cout << "\n\t\t Enter the number of reports : ";
-	cin >> numberOfreports;
+	cin >> number_of_reports;
     
-    if(numberOfreports <= 0)
+    if(number_of_reports <= 0)
     {
         cout << " Number of reports can't be 0 or signed integer , Please re run the program and insert a valid number " << std::endl;
         exit(1);
     }
 
-    struct students_details report[numberOfreports];
+    struct students_details report[number_of_reports];
 	
-    for(int i=0; i < numberOfreports; i++) // Loop till i is not equal to numberOfreports
+    for(int i=0; i < number_of_reports; i++) // Loop till i is not equal to number_of_reports
 	{
 		cout << "\n\t\t REPORT CARD " << i+1 << " :- " << endl;
 		cout << "\t\t ----------------------------- \n";
@@ -181,45 +182,43 @@ void Execute()
 			report[i].total = report[i].total + report[i].marks[j];
 		}
 		
-        report[i].average = report[i].total/6;
-		report[i].percentage = ((float)report[i].total/600.0)*100.0;	
+        report[i].average = (double)report[i].total/6;
+		report[i].percentage = ((double)report[i].total/600.0)*100.0;
 	}
 	char ch;
 	
     cout << "\n\t\t Store this report to a file ? (y/n) : ";
 	cin >> ch;
 	
-    if(ch == 'y')
-	{
-		for(int j=0; j < numberOfreports; j++)
-		{
-			if(j==0)
-			{
-				fstream tFile;  // Declaring variable to hold data for storing to or reading from a file
-				
-                tFile.open("student_report.txt", ios::out);  // Open "report.txt" in Output Mode , Overwrites the file on each execution 
-				tFile << "\n\t\t\t STUDENTS MARKLIST \n\n"; // Datas inserted to tFile variable is stored into report.tx
-				tFile.close(); // Store all content in tFile variable to "report.txt" and close the file
-			}
-			fstream outFile;
-			
+    if(ch == 'y') {
+        for (int j = 0; j < number_of_reports; j++) {
+            if (j == 0) {
+                fstream tFile;  // Declaring variable to hold data for storing to or reading from a file
+
+                tFile.open("student_report.txt",
+                           ios::out);  // Open "student_report.txt" in Output Mode , Overwrites the file on each execution
+                tFile << "\n\t\t\t STUDENTS MARKLIST \n\n"; // Data inserted to tFile variable is stored into stduent_report.txt
+                tFile.close(); // Store all content in tFile variable to "student_report.txt" and close the file
+            }
+            fstream outFile;
+
             outFile.open("student_report.txt", ios::out | ios::app); /** Open file in Output Mode and Append Mode , Append Mode stores contents of variable
 															   * at the end of the file , Thus preventing Overwriting on each execution **/
-			outFile << "\n\n REPORT CARD " << j+1 << "\n";
-			outFile << " ------------------------ \n\n";
-			outFile << " Name : " << report[j].name << endl;
-			outFile << " Roll Number : " << report[j].roll_num << endl;
-			outFile << " Total Mark : " << report[j].total << endl;
-			outFile << " Average Mark : " << report[j].average << endl;
-			outFile << " Percentage : " << report[j].percentage << "%" << endl;
-			outFile.close();
-		
-		}
-		cout << colors::green << "\n\t\t Done , Check students_report.txt in the current Directory !" << colors::white << endl;
-		
-        history(numberOfreports, report, subjects); // Calls history() with integer and char*
-	}
-	else{
+            outFile << "\n\n REPORT CARD " << j + 1 << "\n";
+            outFile << " ------------------------ \n\n";
+            outFile << " Name : " << report[j].name << endl;
+            outFile << " Roll Number : " << report[j].roll_num << endl;
+            outFile << " Total Mark : " << report[j].total << endl;
+            outFile << " Average Mark : " << report[j].average << endl;
+            outFile << " Percentage : " << report[j].percentage << "%" << endl;
+            outFile.close();
+
+        }
+        cout << colors::green << "\n\t\t Done , Check students_report.txt in the current Directory !" << colors::white
+             << endl;
+
+        history(number_of_reports, report, subjects); // Calls history() with integer and char*
+    } else{
 		cout << "\n\t\t Exiting " << endl;
 	}
 }
@@ -291,7 +290,7 @@ void manage(int n)
 		if(remove(".report_history")==0) // remove("file") , removes file named "file" in the current directory , returns 0 on successful remove 
 			cout << "\n Logs Successfully Deleted " << endl;
 		else
-			cout << "\n Error while deleting file " << endl;;
+			cout << "\n Error while deleting file " << endl;
 		
 	}
 }
