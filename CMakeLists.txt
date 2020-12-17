@@ -1,3 +1,7 @@
-project("Report Maker")
+cmake_minimum_required(VERSION 3.9)
+project(report_maker)
 
-add_executable(reportmaker main.cpp)
+set(CMAKE_CXX_STANDARD 11)
+
+add_executable(report_maker
+        main.cpp CredsManager.h CredsManager.cpp)

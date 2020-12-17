@@ -52,6 +52,7 @@
 #include <ctime>
 #include <ios>
 #include <limits>
+#include "CredsManager.h"
 #ifdef _WIN32
     const char* cmd = "cls";
     const char* hold = "PAUSE";
@@ -74,6 +75,9 @@ struct students_details{
 };
 void history(int, struct students_details *report, const char **arr);
 bool check_exist(int, int, struct students_details *report);
+void New_Account();
+void Login();
+void Change_Password();
 
 namespace colors{
 	const char* red = "\033[1;31m";
@@ -83,6 +87,21 @@ namespace colors{
 };
 
 int main()
+{
+    if(FILE *file = fopen("creds.dat", "r")) {
+        fclose(file);
+        Login();
+    } else{
+        New_Account();
+    }
+
+#ifdef _WIN32
+    system(hold);
+#endif
+    return 0;
+}
+
+void main_menu()
 {
 	int op;
 	system(cmd);
@@ -94,12 +113,13 @@ int main()
 		            |_|                                       
 
   
-	            Developed by IKT HSS SSC BATCH 2020
+	                Developed by IKT HSS SSC BATCH 2020
 	)" << colors::white << endl;	
 	cout << "\n\t\t\t\t 1. Create a New Report " << endl;
 	cout << "\t\t\t\t 2. Check the Report log "  << endl;
 	cout << "\t\t\t\t 3. Delete the Report log " << endl;
-	cout << "\t\t\t\t 4. About the program " << endl;
+	cout << "\t\t\t\t 4. Change Account Username and Password " << endl;
+    cout << "\t\t\t\t 5. About the program " << endl;
 	cout << "\t\t\t\t 0. Exit the program " << endl;
 	cout << "\t\t\t\t Enter a option to continue : ";
 	cin >> op;
@@ -112,7 +132,10 @@ int main()
 		case 3:
 			manage(op); 
 			break;
-		case 4:
+        case 4:
+            Change_Password();
+            break;
+        case 5:
 			cout << colors::green << "\n\t\t\t\t Developed by IKT HSS SSC BATCH " << endl;
 			cout << "\t\t\t\t Simple program to make report cards of students " << endl;
 			cout << "\t\t\t\t History logs are stored in .report_history file and can be accessed using Option 3 in main menu " << endl;
@@ -124,10 +147,6 @@ int main()
 			break;
 	}
     cout << colors::white << endl;
-	#ifdef _WIN32
-		system(hold);
-	#endif
-	return 0;
 }
 
 void Execute()
@@ -305,4 +324,48 @@ bool check_exist(int roll_num, int i, struct students_details *report)
             return true;
     }
     return false;
+}
+
+void New_Account()
+{
+    ofstream outFile;
+    outFile.open("creds.dat", ios::binary);
+    CredsManager MyCred;
+    MyCred.Register_Account();
+    outFile.write((char*)&MyCred, sizeof(MyCred));
+    cout << " Successfully Created " << endl;
+    outFile.close();
+}
+
+void Login()
+{
+    bool success = false;
+    string uname;
+    int pass;
+    ifstream inFile;
+    inFile.open("creds.dat", ios::binary);
+    CredsManager MyCred;
+    cout << "\t\t\t LOGIN \n";
+    cout << " Enter your Username : ";
+    cin >> uname;
+    cout << " Enter your Passcode : ";
+    cin >> pass;
+    while(inFile.read((char*)&MyCred, sizeof(MyCred)));
+    success = MyCred.Login_Account(uname, pass);
+    if(!success)
+        cout << " Failed to Login , Invalid Username or Passcode " << endl;
+    else
+        main_menu();
+    inFile.close();
+}
+
+void Change_Password()
+{
+    ofstream outFile;
+    outFile.open("creds.dat", ios::binary);
+    CredsManager MyCred;
+    MyCred.Register_Account();
+    outFile.write((char*)&MyCred, sizeof(MyCred));
+    cout << " Username & Password Changed Successfully " << endl;
+    outFile.close();
 }
