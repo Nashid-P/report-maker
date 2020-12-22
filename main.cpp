@@ -17,7 +17,7 @@
  * 		Description : Check a string for the presence of numbers in it , returns true if found
  *			std::string See : https://www.geeksforgeeks.org/stdstring-class-in-c/ 	
  *	
- *  void Execute()
+ *      void Execute()
  * 		data type void , returns no value
  * 		Argument type void , doesn't accept any arguments
  * 		Description : Core function of the program , Ask user for inputs and store them into a file
@@ -52,7 +52,7 @@
 #include <ctime>
 #include <ios>
 #include <limits>
-#include "CredsManager.h"
+#include "ProfileManager.h"
 #ifdef _WIN32
     const char* cmd = "cls";
     const char* hold = "PAUSE";
@@ -62,6 +62,7 @@
 
 using namespace std;
 
+void main_menu(string username);
 bool check(string arr); 
 void Execute(); 
 void manage(int );
@@ -75,9 +76,6 @@ struct students_details{
 };
 void history(int, struct students_details *report, const char **arr);
 bool check_exist(int, int, struct students_details *report);
-void New_Account();
-void Login();
-void Change_Password();
 
 namespace colors{
 	const char* red = "\033[1;31m";
@@ -88,23 +86,29 @@ namespace colors{
 
 int main()
 {
-    if(FILE *file = fopen("creds.dat", "r")) {
-        fclose(file);
-        Login();
-    } else{
-        New_Account();
+    ProfileManager UserProfile;
+    if(UserProfile.get_exist_flag())
+    {
+        if(UserProfile.login_user())
+        {
+            main_menu(UserProfile.get_username());
+        }
     }
+    else
+        UserProfile.setup_user();
 
 #ifdef _WIN32
     system(hold);
 #endif
+
     return 0;
 }
 
-void main_menu()
+void main_menu(string username)
 {
-	int op;
-	system(cmd);
+    ProfileManager CurrentUser;
+    int op;
+    system(cmd);
     cout << colors::red << R"(                                                      
 		   _____                 _      _____     _           
 		  | __  |___ ___ ___ ___| |_   |     |___| |_ ___ ___ 
@@ -114,117 +118,116 @@ void main_menu()
 
   
 	                Developed by IKT HSS SSC BATCH 2020
-	)" << colors::white << endl;	
-	cout << "\n\t\t\t\t 1. Create a New Report " << endl;
-	cout << "\t\t\t\t 2. Check the Report log "  << endl;
-	cout << "\t\t\t\t 3. Delete the Report log " << endl;
-	cout << "\t\t\t\t 4. Change Account Username and Password " << endl;
-    cout << "\t\t\t\t 5. About the program " << endl;
-	cout << "\t\t\t\t 0. Exit the program " << endl;
-	cout << "\t\t\t\t Enter a option to continue : ";
-	cin >> op;
-	switch(op)
-	{
-		case 1:
-			Execute(); 
-			break;
-		case 2:
-		case 3:
-			manage(op); 
-			break;
+    )" << colors::white << endl;
+    cout << "\n\n\t\t\t Logged in as " << username << endl;
+    cout << "\n\t\t\t 1. Create a New Report " << endl;
+    cout << "\t\t\t 2. Check the Report log "  << endl;
+    cout << "\t\t\t 3. Delete the Report log " << endl;
+    cout << "\t\t\t 4. Change Account Username and Password " << endl;
+    cout << "\t\t\t 5. About the program " << endl;
+    cout << "\t\t\t 0. Exit the program " << endl;
+    cout << "\t\t\t Enter a option to continue : ";
+    cin >> op;
+    switch(op)
+    {
+	case 1:
+	    Execute(); 
+	    break;
+	case 2:
+	case 3:
+	    manage(op); 
+	    break;
         case 4:
-            Change_Password();
+            CurrentUser.setup_user();
             break;
         case 5:
-			cout << colors::green << "\n\t\t\t\t Developed by IKT HSS SSC BATCH " << endl;
-			cout << "\t\t\t\t Simple program to make report cards of students " << endl;
-			cout << "\t\t\t\t History logs are stored in .report_history file and can be accessed using Option 3 in main menu " << endl;
-			cout << "\t\t\t\t Thank you for using our program \n\n\n" << colors::white << endl;
-			break;
-		default:
-			cout << "\n\t\t\t\t Exiting Program " << endl;
-			system(cmd);
-			break;
-	}
+	    cout << colors::green << "\n\t\t\t Developed by IKT HSS SSC BATCH " << endl;
+	    cout << "\t\t\t Simple program to make report cards of students " << endl;
+	    cout << "\t\t\t Thank you for using our program \n\n\n" << colors::white << endl;
+	    break;
+	default:
+	    cout << "\n\t\t\t Exiting Program " << endl;
+	    system(cmd);
+	    break;
+    }
     cout << colors::white << endl;
 }
 
 void Execute()
 {
 	
-	int number_of_reports;
+    int number_of_reports;
 	
     // Available Subjects
-	const char* subjects[] = {
-						" Chemistry : ",
-						" Physics : ",
-						" Maths : ",
-						" Computer Science : ",
-						" English : ",
-						" First Language : "}; 
-	
-	cout << "\n\n\t\t\t\t STUDENTS MARK LIST \t\t\n";
-	cout << "\n\t\t Enter the number of reports : ";
-	cin >> number_of_reports;
-    
+    const char* subjects[] = {
+	" Chemistry : ",
+	" Physics : ",
+	" Maths : ",
+	" Computer Science : ",
+	" English : ",
+	" First Language : "
+    }; 	
+    cout << "\n\n\t\t\t STUDENTS MARK LIST \t\t\n";
+    cout << "\n Enter the number of reports : ";
+    cin >> number_of_reports;
     if(number_of_reports <= 0)
     {
-        cout << " Number of reports can't be 0 or signed integer , Please re run the program and insert a valid number " << std::endl;
+        cout << colors::red << " Number of reports can't be 0 or signed integer , Please re run the program and insert a valid number " << colors::white << endl;
         exit(1);
     }
-
-    struct students_details report[number_of_reports];
-	
+    struct students_details report[number_of_reports];	
     for(int i=0; i < number_of_reports; i++) // Loop till i is not equal to number_of_reports
-	{
-		cout << "\n\t\t REPORT CARD " << i+1 << " :- " << endl;
-		cout << "\t\t ----------------------------- \n";
-		
-        do{
+    {
+	cout << "\n\t\t REPORT CARD " << i+1 << " :- " << endl;
+	cout << "\t\t ----------------------------- \n";	
+        do
+        {
             // clear buffer
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			cout << "\t\t Enter the name of the student : ";
-			getline(cin, report[i].name); 
-			if(check(report[i].name))
-				cout << colors::red << "\t\t Name should not contain numbers , Please enter the name again in correct format " << colors::white << endl;
-		}while(check(report[i].name));
+	    cout << " Enter the name of the student : ";
+	    getline(cin, report[i].name); 
+	    if(check(report[i].name))
+		cout << colors::red << " Name should not contain numbers , Please enter the name again in correct format " << colors::white << endl;
+	}while(check(report[i].name));
 		
-        do{ 
-            cout << "\t\t Enter the roll number : ";
-		    cin >> report[i].roll_num;
-		    if(check_exist(report[i].roll_num, i, report))
-                cout << colors::red << "\t\t This roll number already exists in the current report , please enter correct roll number " << colors::white << endl;
+        do
+        { 
+            cout << " Enter the roll number : ";
+	    cin >> report[i].roll_num;
+	    if(check_exist(report[i].roll_num, i, report))
+                cout << colors::red << " This roll number already exists in the current report , please enter correct roll number " << colors::white << endl;
         }while(check_exist(report[i].roll_num, i, report));
         
         for(int j = 0; j < 6; j++)
-		{
-			cout << "\t\t Enter the mark of" << subjects[j];
-			cin >> report[i].marks[j];
-			report[i].total = report[i].total + report[i].marks[j];
-		}
+	{
+	    cout << " Enter the mark of" << subjects[j];
+	    cin >> report[i].marks[j];
+	    report[i].total = report[i].total + report[i].marks[j];
+	}
 		
         report[i].average = (double)report[i].total/6;
-		report[i].percentage = ((double)report[i].total/600.0)*100.0;
-	}
-	char ch;
+	report[i].percentage = ((double)report[i].total/600.0)*100.0;
+    }
+    
+    char ch;	
+    
+    cout << "\n Store this report to a file ? (y/n) : ";
+    cin >> ch;
 	
-    cout << "\n\t\t Store this report to a file ? (y/n) : ";
-	cin >> ch;
-	
-    if(ch == 'y') {
-        for (int j = 0; j < number_of_reports; j++) {
-            if (j == 0) {
+    if(ch == 'y') 
+    {
+        for (int j = 0; j < number_of_reports; j++) 
+        {
+            if (j == 0) 
+            {
                 fstream tFile;  // Declaring variable to hold data for storing to or reading from a file
 
-                tFile.open("student_report.txt",
-                           ios::out);  // Open "student_report.txt" in Output Mode , Overwrites the file on each execution
+                tFile.open("student_report.txt", ios::out);  // Open "student_report.txt" in Output Mode , Overwrites the file on each execution
                 tFile << "\n\t\t\t STUDENTS MARKLIST \n\n"; // Data inserted to tFile variable is stored into stduent_report.txt
                 tFile.close(); // Store all content in tFile variable to "student_report.txt" and close the file
             }
             fstream outFile;
-
-            outFile.open("student_report.txt", ios::out | ios::app); /** Open file in Output Mode and Append Mode , Append Mode stores contents of variable
-															   * at the end of the file , Thus preventing Overwriting on each execution **/
+            outFile.open("student_report.txt", ios::out | ios::app); /** Open file in Output Mode and Append Mode , Append Mode stores contents                                                           of variable at the end of the file , Thus preventing Overwriting on each execution **/
             outFile << "\n\n REPORT CARD " << j + 1 << "\n";
             outFile << " ------------------------ \n\n";
             outFile << " Name : " << report[j].name << endl;
@@ -235,85 +238,86 @@ void Execute()
             outFile.close();
 
         }
-        cout << colors::green << "\n\t\t Done , Check students_report.txt in the current Directory !" << colors::white
-             << endl;
-
+        cout << colors::green << "\n Done , Check students_report.txt in the current Directory !" << colors::white << endl;
         history(number_of_reports, report, subjects); // Calls history() with integer and char*
-    } else{
-		cout << "\n\t\t Exiting " << endl;
-	}
+
+    } 
+    else
+    {
+	cout << "\n Exiting " << endl;
+    }
 }
 
 bool check(string arr)
 {
-	for(int i=0; arr[i]!='\0'; i++) // Loop until the end of string
+    for(int i=0; arr[i]!='\0'; i++) // Loop until the end of string
+    {
+	if(arr[i] >= '0' && arr[i] <= '9') // Check each character for between 0 and 9
 	{
-		if(arr[i] >= '0' && arr[i] <= '9') // Check each character for between 0 and 9
-		{
-			return true; // if a character is a number , return true and exit the function
-		}
+	    return true; // if a character is a number , return true and exit the function
 	}
-	return false; 
+    }
+    return false; 
 }
 
 void history(int n, struct students_details *report, const char** arr)
 {
-	time_t tt; // Declaring variable to store time
-	struct tm * ti; // Declaring pointer variable for structure tm
-	time(&tt); 
-	ti = localtime(&tt); 
-	fstream historyFile;
-	
+    time_t tt; // Declaring variable to store time
+    struct tm * ti; // Declaring pointer variable for structure tm
+    time(&tt); 
+    ti = localtime(&tt); 
+    fstream historyFile;
+
     historyFile.open(".report_history", ios::out | ios::app);
-	for(int i=0; i < n ; i++)
-	{
-		if(i==0)
-			historyFile << "\n DATE : " << asctime(ti) << endl; // Store time and date 
+    for(int i=0; i < n ; i++)
+    {
+	if(i==0)
+	    historyFile << "\n DATE : " << asctime(ti) << endl; // Store time and date 
 		
         historyFile << " REPORT CARD " << i+1 << endl;
-		historyFile << " ----------------------- " << endl;
-		historyFile << " Name : " << report[i].name << endl;
-		historyFile << " Roll Number : " << report[i].roll_num << endl;
+	historyFile << " ----------------------- " << endl;
+	historyFile << " Name : " << report[i].name << endl;
+    	historyFile << " Roll Number : " << report[i].roll_num << endl;
 		
         for(int j=0;j<6;j++)
-		{
-			historyFile << arr[j] << report[i].marks[j] << ",";
-		}
+	{
+	    historyFile << arr[j] << report[i].marks[j] << ",";
+	}
 		
         historyFile << endl;
-		historyFile << " Total Mark : " << report[i].total << endl;
-		historyFile << " Average Mark : " << report[i].average << endl;
-		historyFile << " Percentage : " << report[i].percentage << "% \n" << endl; 
-	}
+	historyFile << " Total Mark : " << report[i].total << endl;
+	historyFile << " Average Mark : " << report[i].average << endl;
+	historyFile << " Percentage : " << report[i].percentage << "% \n" << endl; 
+    }
 }
 
 void manage(int n)
 {
-	if(n == 2)
-	{
-		string line; // String variable to store contents of file
-		fstream inFile; // Declaring variable to hold contents of file
-		inFile.open(".report_history", ios::in);  // Open file in Input Mode / Read Mode
+    if(n == 2)
+    {
+	string line; // String variable to store contents of file
+	fstream inFile; // Declaring variable to hold contents of file
+	inFile.open(".report_history", ios::in);  // Open file in Input Mode / Read Mode
 		
         if(!inFile) // If variable return 0 , Error in opening file
-			cout << "\t\t No previous logs found \n" << endl;
+	    cout << colors::red << "\n No previous logs found \n" << colors::white << endl;
 		
         while(inFile) // Loop until the end of file
-		{
-			getline(inFile, line); // retrieve contents from file variable to string variable
-			cout << colors::cyan << line << endl; // Display contents of string variable , That is , lines in the file
-		}
-		inFile.close(); // Close the file after Reading
-		
-	}
-	else if(n == 3)
 	{
-		if(remove(".report_history")==0) // remove("file") , removes file named "file" in the current directory , returns 0 on successful remove 
-			cout << "\n Logs Successfully Deleted " << endl;
-		else
-			cout << "\n Error while deleting file " << endl;
-		
+	    getline(inFile, line); // retrieve contents from file variable to string variable
+	    cout << colors::cyan << line << endl; // Display contents of string variable , That is , lines in the file
 	}
+	inFile.close(); // Close the file after Reading
+		
+    }
+    else if(n == 3)
+    {
+	if(remove(".report_history")==0) // remove("file") , removes file named "file" in the current directory , returns 0 on successful remove
+            cout << "\n Logs Successfully Deleted " << endl;
+	else
+	    cout << colors::red << "\n Error while deleting file " << colors::white << endl;
+		
+    }
 }
 
 bool check_exist(int roll_num, int i, struct students_details *report)
@@ -326,46 +330,3 @@ bool check_exist(int roll_num, int i, struct students_details *report)
     return false;
 }
 
-void New_Account()
-{
-    ofstream outFile;
-    outFile.open("creds.dat", ios::binary);
-    CredsManager MyCred;
-    MyCred.Register_Account();
-    outFile.write((char*)&MyCred, sizeof(MyCred));
-    cout << " Successfully Created " << endl;
-    outFile.close();
-}
-
-void Login()
-{
-    bool success = false;
-    string uname;
-    int pass;
-    ifstream inFile;
-    inFile.open("creds.dat", ios::binary);
-    CredsManager MyCred;
-    cout << "\t\t\t LOGIN \n";
-    cout << " Enter your Username : ";
-    cin >> uname;
-    cout << " Enter your Passcode : ";
-    cin >> pass;
-    while(inFile.read((char*)&MyCred, sizeof(MyCred)));
-    success = MyCred.Login_Account(uname, pass);
-    if(!success)
-        cout << " Failed to Login , Invalid Username or Passcode " << endl;
-    else
-        main_menu();
-    inFile.close();
-}
-
-void Change_Password()
-{
-    ofstream outFile;
-    outFile.open("creds.dat", ios::binary);
-    CredsManager MyCred;
-    MyCred.Register_Account();
-    outFile.write((char*)&MyCred, sizeof(MyCred));
-    cout << " Username & Password Changed Successfully " << endl;
-    outFile.close();
-}
