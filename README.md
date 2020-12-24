@@ -1,10 +1,5 @@
 # Report Maker
 
-[![Code Grade](https://www.code-inspector.com/project/15211/status/svg)](https://frontend.code-inspector.com/public/project/15211/report-maker/dashboard)
-![Code Score](https://www.code-inspector.com/project/15211/score/svg)
-
-بِسْمِ ٱللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ , السَّلاَمُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ
-
 Report Maker is a simple students report card making program in C++
 
 **Compile**
