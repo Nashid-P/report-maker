@@ -12,6 +12,7 @@
 /bin/
 /out/
 /cmake-build-*/
+/.vscode/
 
 ### CMake ###
 CMakeCache.txt

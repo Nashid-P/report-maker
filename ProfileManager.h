@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PROFILE_MANAGER_H
 #define PROFILE_MANAGER_H
 
